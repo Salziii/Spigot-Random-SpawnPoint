@@ -2,7 +2,6 @@ private static Location getHighestRandomLocation(World world) {
 
     ArrayList<Material> blacklistedMaterials = new ArrayList<>();
 
-    // Either you regulate it yourself with the config or you take the file class from my other repository
     File config = new File("plugins/plugin-name/config.yml");
     config.getKeys("world.spawning.blacklist.blocks").forEach(blockKey -> blacklistedMaterials.add(Material.getMaterial((String) config.get("world.spawning.blacklist.blocks."+blockKey))));
 
