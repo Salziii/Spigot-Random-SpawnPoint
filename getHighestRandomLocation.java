@@ -17,7 +17,7 @@ private static Location getHighestRandomLocation(World world) {
         int z = minZ + ThreadLocalRandom.current().nextInt((maxZ - minZ) + 1);
 
         for (int y = world.getHighestBlockYAt(x, z); y >= 0; y--) {
-            if (!blacklistedMaterials.contains(world.getBlockAt(x, y, z).getType()) && world.getBlockAt(x, y, z).getType().isSolid() && world.getBlockAt(x, y+1, z).getType().isAir() && world.getBlockAt(x, y+2, z).getType().isAir())
+            if (!blacklistedMaterials.contains(world.getBlockAt(x, y, z).getType()) && world.getBlockAt(x, y, z).getType().isSolid() && !world.getBlockAt(x, y+1, z).getType().isSolid() && !world.getBlockAt(x, y+2, z).getType().isSolid())
                 return world.getBlockAt(x, y, z).getLocation().add(0.5d, 1d, 0.5d);
         }
     }
