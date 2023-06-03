@@ -11,7 +11,3 @@ Add the function to a class in your Spigot Api plugin project and import the mis
 
 ### You don't know how to use your own configuration
 Check out my other repository with my config manager
-
-### Questions
-I don't really care
-
