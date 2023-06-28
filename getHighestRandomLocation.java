@@ -1,27 +1,37 @@
-private static Location getHighestRandomLocation(World world) {
+public class RandomPosition {
 
-    ArrayList<Material> blacklistedMaterials = new ArrayList<>();
+    /**
+     * Returns a Location,
+     * which is in a certain limit range of the center,
+     * is not standing on Water, Lava, or Bedrock
+     * and has 1 or 2 non-solid blocks of space
+     * <p>
+     * The method will return 'null'
+     * if the maximum number of attempts (10) that can be set in the config has been reached and no matching block was found
+     *
+     * @param offset certain limit range
+     * @param center center
+     * @param two blocks 2 son-solid blocks of space
+     * @return      A valid Location or null
+     * @see         Location
+     */
+   public static Location withOffset(Location center, int offset, boolean twoBlocks) {
+      World world = center.getWorld();
 
-    File config = new File("plugins/plugin-name/config.yml");
-    config.getKeys("world.spawning.blacklist.blocks").forEach(blockKey -> blacklistedMaterials.add(Material.getMaterial((String) config.get("world.spawning.blacklist.blocks."+blockKey))));
+      int trys = 0;
+      while (trys < 10) {
+         trys++;
+         double x = center.getX() + ThreadLocalRandom.current().nextInt(-offset, offset+1);
+         double z = center.getZ() + ThreadLocalRandom.current().nextInt(-offset, offset+1);
 
-    int minX = (int) config.get("world.spawning.minX");
-    int maxX = (int) config.get("world.spawning.maxX");
-    int minZ = (int) config.get("world.spawning.minZ");
-    int maxZ = (int) config.get("world.spawning.maxZ");
+         for (int y = world.getHighestBlockYAt((int) x, (int) z); y >= 0; y--) {
+               if ((world.getEnvironment().equals(World.Environment.CUSTOM) || world.getEnvironment().equals(World.Environment.NORMAL)) && GameManager.getBlacklistedMaterials().contains(world.getBlockAt((int) x, y, (int) z).getType())) continue;
+               if (world.getBlockAt((int) x, y, (int) z).getType().isSolid() && !world.getBlockAt((int) x, y+1, (int) z).getType().isSolid() && !GameManager.getBlacklistedMaterials().contains(world.getBlockAt((int) x, y, (int) z).getType()))
+                  if (twoBlocks && world.getBlockAt((int) x, y+2, (int) z).getType().isSolid()) continue;
+                  return new Location(world, x, y+1, z);
+         }
+      }
+      return null;
+   }
 
-    int trys = 0;
-    while (trys < (int) config.get("world.spawning.maxTrys")) {
-        trys++;
-        int x = minX + ThreadLocalRandom.current().nextInt((maxX - minX) + 1);
-        int z = minZ + ThreadLocalRandom.current().nextInt((maxZ - minZ) + 1);
-
-        for (int y = world.getHighestBlockYAt(x, z); y >= 0; y--) {
-            if (!blacklistedMaterials.contains(world.getBlockAt(x, y, z).getType()) && world.getBlockAt(x, y, z).getType().isSolid() && world.getBlockAt(x, y+1, z).getType().isAir() && world.getBlockAt(x, y+2, z).getType().isAir())
-                return world.getBlockAt(x, y, z).getLocation().add(0.5d, 1d, 0.5d);
-        }
-    }
-
-    return world.getSpawnLocation();
-    
 }
